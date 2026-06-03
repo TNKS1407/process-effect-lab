@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Process Effect Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f2ec;--card:#fff;--surface:#f0ece6;--border:#e3dbd0;
+  --accent:#3c7876;--accent-dim:rgba(60,120,118,.09);--accent-soft:#e6f0ef;
+  --text:#1d1b17;--muted:#7d7568;--faint:#aaa49b;
+  --ok:#2e7d5e;--warn:#8c5a1a;--dot:#cfc9be;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Zen Kaku Gothic New',system-ui,sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;padding-bottom:4rem;
+  background-image:radial-gradient(circle,var(--dot) 1px,transparent 0);
+  background-size:20px 20px;}
+header{position:sticky;top:0;z-index:100;background:rgba(245,242,236,.92);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.header-inner{max-width:960px;margin:0 auto;height:50px;display:flex;align-items:center;
+  gap:1rem;padding:0 1.5rem;}
+.logo{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:700;color:var(--text);}
+.logo span{color:var(--accent);}
+.caption{font-size:.75rem;color:var(--muted);}
+
+main{max-width:960px;margin:0 auto;padding:1.75rem 1.5rem 3rem;}
+
+/* Tab nav */
+.tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.5rem;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.6rem;}
+.tab-btn{padding:.35rem .8rem;border-radius:7px;border:1px solid transparent;
+  background:none;font-family:inherit;font-size:.8rem;font-weight:500;
+  color:var(--muted);cursor:pointer;transition:all .15s;}
+.tab-btn:hover{color:var(--accent);background:var(--accent-dim);}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* Panel */
+.panel{display:none;}
+.panel.active{display:block;}
+.panel-head{margin-bottom:1.25rem;}
+.panel-title{font-size:1rem;font-weight:700;margin-bottom:.3rem;}
+.panel-desc{font-size:.82rem;color:var(--muted);line-height:1.6;}
+
+/* Controls */
+.controls{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:1.25rem;margin-bottom:1.25rem;}
+.ctrl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem 1.5rem;}
+.ctrl{display:flex;flex-direction:column;gap:.3rem;}
+.ctrl label{font-size:.72rem;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace;
+  display:flex;justify-content:space-between;}
+.ctrl label span{color:var(--accent);font-weight:700;}
+input[type=range]{width:100%;height:4px;border-radius:2px;accent-color:var(--accent);cursor:pointer;}
+input[type=number]{width:100%;padding:.3rem .5rem;border:1px solid var(--border);
+  border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.82rem;
+  color:var(--text);background:var(--surface);outline:none;}
+input[type=number]:focus{border-color:var(--accent);}
+.run-btn{margin-top:1rem;padding:.5rem 1.2rem;background:var(--accent);color:#fff;
+  border:none;border-radius:8px;font-family:inherit;font-size:.85rem;font-weight:700;
+  cursor:pointer;transition:opacity .15s;}
+.run-btn:hover{opacity:.85;}
+.run-btn:disabled{opacity:.45;cursor:not-allowed;}
+
+/* Results */
+.results{display:flex;flex-direction:column;gap:1.25rem;}
+.result-status{font-size:.78rem;color:var(--muted);font-family:'JetBrains Mono',monospace;
+  padding:.35rem 0;min-height:1.6rem;}
+.result-status.running{color:var(--warn);}
+.result-status.error{color:#b84040;}
+.images{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:1rem;}
+.images img{width:100%;border-radius:10px;border:1px solid var(--border);}
+.table-wrap{overflow-x:auto;margin-top:.25rem;}
+.table-title{font-size:.72rem;font-weight:700;color:var(--faint);letter-spacing:.07em;
+  font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:.4rem;}
+table{width:100%;border-collapse:collapse;font-size:.78rem;}
+th{background:var(--surface);color:var(--muted);font-family:'JetBrains Mono',monospace;
+  font-size:.68rem;padding:.4rem .65rem;border-bottom:1px solid var(--border);text-align:left;}
+td{padding:.35rem .65rem;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;}
+tr:last-child td{border-bottom:none;}
+
+/* Knob table */
+.knob-section{background:var(--accent-soft);border:1px solid rgba(60,120,118,.2);
+  border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;}
+.knob-section .table-title{color:var(--accent);}
+.knob-section table th{background:transparent;}
+
+@media(max-width:600px){.images{grid-template-columns:1fr;}.ctrl-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <span class="logo">Process <span>Effect</span> Lab</span>
+    <span class="caption">パラメータを動かして何が起きるかを確認する</span>
+  </div>
+</header>
+
+<main>
+
+<div class="knob-section">
+  <div class="table-title">何を変えると何が起きるか</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>テーマ</th><th>変えるもの</th><th>増やすと起きやすいこと</th></tr></thead>
+      <tbody>
+        <tr><td>単回帰</td><td>y_noise</td><td>y 側のばらつきが増え、相関・R² が下がる</td></tr>
+        <tr><td>単回帰</td><td>x_noise</td><td>x の測定誤差が増え、OLS の傾きが真値からずれやすい</td></tr>
+        <tr><td>多重共線性</td><td>collinearity</td><td>条件数・VIF・係数のばらつきが大きくなる</td></tr>
+        <tr><td>PLS</td><td>pls_components</td><td>少なすぎると不足、多すぎると OLS に近づく</td></tr>
+        <tr><td>JIT</td><td>k / bandwidth</td><td>大きいほど全体モデルに近づき局所性が落ちる</td></tr>
+        <tr><td>グレーボックス</td><td>physics_bias</td><td>物理モデル単独の系統誤差が増える</td></tr>
+        <tr><td>転移</td><td>domain_gap</td><td>素朴な転移が害になりやすい（負の転移）</td></tr>
+        <tr><td>生データ</td><td>range_shift / trend</td><td>モデル前に分割・前処理が必要になる</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab-btn active" data-tab="regression">単回帰</button>
+  <button class="tab-btn" data-tab="multicollinearity">多重共線性・PLS</button>
+  <button class="tab-btn" data-tab="jit">JIT</button>
+  <button class="tab-btn" data-tab="graybox">グレーボックス</button>
+  <button class="tab-btn" data-tab="transfer">転移学習</button>
+  <button class="tab-btn" data-tab="rawdata">生データ診断</button>
+</div>
+
+<!-- ── 単回帰 ── -->
+<div class="panel active" id="panel-regression">
+  <div class="panel-head">
+    <div class="panel-title">単回帰：ノイズ・測定誤差・外れ値</div>
+    <div class="panel-desc">OLS は x を正確とみなし、y の縦方向の誤差を最小化します。標準化した単回帰の傾きは相関係数になります。</div>
+  </div>
+  <div class="controls">
+    <div class="ctrl-grid">
+      <div class="ctrl"><label>n（サンプル数）<span id="v-r-n">80</span></label><input type="range" id="r-n" min="20" max="300" step="10" value="80"></div>
+      <div class="ctrl"><label>true_slope<span id="v-r-ts">1.0</span></label><input type="range" id="r-ts" min="-3" max="3" step="0.1" value="1.0"></div>
+      <div class="ctrl"><label>y_noise<span id="v-r-yn">0.6</span></label><input type="range" id="r-yn" min="0" max="3" step="0.05" value="0.6"></div>
+      <div class="ctrl"><label>x_noise<span id="v-r-xn">0.0</span></label><input type="range" id="r-xn" min="0" max="2" step="0.05" value="0.0"></div>
+      <div class="ctrl"><label>outlier_strength<span id="v-r-os">0.0</span></label><input type="range" id="r-os" min="0" max="10" step="0.5" value="0.0"></div>
+      <div class="ctrl"><label>seed<span id="v-r-seed">0</span></label><input type="number" id="r-seed" min="0" max="9999" value="0"></div>
+    </div>
+    <button class="run-btn" data-exp="regression">実行</button>
+  </div>
+  <div class="result-status" id="st-regression"></div>
+  <div class="results" id="res-regression"></div>
+</div>
+
+<!-- ── 多重共線性 ── -->
+<div class="panel" id="panel-multicollinearity">
+  <div class="panel-head">
+    <div class="panel-title">多重共線性・PLS：係数はどれだけ信用できるか</div>
+    <div class="panel-desc">入力変数同士が似た動きをすると、予測精度がそこそこでも係数解釈は壊れます。collinearity と pls_components を動かしてください。</div>
+  </div>
+  <div class="controls">
+    <div class="ctrl-grid">
+      <div class="ctrl"><label>n_train<span id="v-mc-nt">80</span></label><input type="range" id="mc-nt" min="20" max="300" step="10" value="80"></div>
+      <div class="ctrl"><label>n_features<span id="v-mc-nf">8</span></label><input type="range" id="mc-nf" min="3" max="20" step="1" value="8"></div>
+      <div class="ctrl"><label>collinearity<span id="v-mc-cl">0.95</span></label><input type="range" id="mc-cl" min="0" max="0.995" step="0.005" value="0.95"></div>
+      <div class="ctrl"><label>y_noise<span id="v-mc-yn">0.25</span></label><input type="range" id="mc-yn" min="0" max="2" step="0.05" value="0.25"></div>
+      <div class="ctrl"><label>pls_components<span id="v-mc-pc">2</span></label><input type="range" id="mc-pc" min="1" max="10" step="1" value="2"></div>
+      <div class="ctrl"><label>ridge_alpha<span id="v-mc-ra">1.0</span></label><input type="range" id="mc-ra" min="0" max="20" step="0.5" value="1.0"></div>
+    </div>
+    <button class="run-btn" data-exp="multicollinearity">実行</button>
+  </div>
+  <div class="result-status" id="st-multicollinearity"></div>
+  <div class="results" id="res-multicollinearity"></div>
+</div>
+
+<!-- ── JIT ── -->
+<div class="panel" id="panel-jit">
+  <div class="panel-head">
+    <div class="panel-title">JIT 型モデル：近いデータだけをどれくらい使うか</div>
+    <div class="panel-desc">固定モデルと 1-NN、kNN、局所線形、局所重み付き PLS を比較します。k や bandwidth が局所性を決めます。</div>
+  </div>
+  <div class="controls">
+    <div class="ctrl-grid">
+      <div class="ctrl"><label>x1_current<span id="v-jit-x1">0.5</span></label><input type="range" id="jit-x1" min="-3" max="3" step="0.1" value="0.5"></div>
+      <div class="ctrl"><label>x2_current<span id="v-jit-x2">0.0</span></label><input type="range" id="jit-x2" min="-2" max="2" step="0.1" value="0.0"></div>
+      <div class="ctrl"><label>wear_current<span id="v-jit-wc">0.85</span></label><input type="range" id="jit-wc" min="0" max="1" step="0.01" value="0.85"></div>
+      <div class="ctrl"><label>k<span id="v-jit-k">35</span></label><input type="range" id="jit-k" min="1" max="150" step="1" value="35"></div>
+      <div class="ctrl"><label>bandwidth<span id="v-jit-bw">0.8</span></label><input type="range" id="jit-bw" min="0.1" max="3" step="0.05" value="0.8"></div>
+      <div class="ctrl"><label>pls_components<span id="v-jit-pc">2</span></label><input type="range" id="jit-pc" min="1" max="3" step="1" value="2"></div>
+      <div class="ctrl"><label>nonlinearity<span id="v-jit-nl">1.3</span></label><input type="range" id="jit-nl" min="0.2" max="3" step="0.1" value="1.3"></div>
+      <div class="ctrl"><label>drift_strength<span id="v-jit-ds">1.0</span></label><input type="range" id="jit-ds" min="0" max="3" step="0.1" value="1.0"></div>
+      <div class="ctrl"><label>noise<span id="v-jit-ns">0.12</span></label><input type="range" id="jit-ns" min="0" max="1" step="0.01" value="0.12"></div>
+    </div>
+    <button class="run-btn" data-exp="jit">実行</button>
+  </div>
+  <div class="result-status" id="st-jit"></div>
+  <div class="results" id="res-jit"></div>
+</div>
+
+<!-- ── グレーボックス ── -->
+<div class="panel" id="panel-graybox">
+  <div class="panel-head">
+    <div class="panel-title">グレーボックス：物理モデルに統計補正を足す</div>
+    <div class="panel-desc">物理モデルのみ・統計モデルのみ・Parallel・Serial・Combined を比較します。残差の可観測性とパラメータドリフトが鍵です。</div>
+  </div>
+  <div class="controls">
+    <div class="ctrl-grid">
+      <div class="ctrl"><label>physics_bias<span id="v-gb-pb">0.3</span></label><input type="range" id="gb-pb" min="-2" max="2" step="0.1" value="0.3"></div>
+      <div class="ctrl"><label>parameter_drift<span id="v-gb-pd">0.7</span></label><input type="range" id="gb-pd" min="0" max="2" step="0.05" value="0.7"></div>
+      <div class="ctrl"><label>residual_strength<span id="v-gb-rs">0.8</span></label><input type="range" id="gb-rs" min="0" max="2" step="0.05" value="0.8"></div>
+      <div class="ctrl"><label>residual_observability<span id="v-gb-ro">0.8</span></label><input type="range" id="gb-ro" min="0" max="1" step="0.05" value="0.8"></div>
+      <div class="ctrl"><label>noise<span id="v-gb-ns">0.1</span></label><input type="range" id="gb-ns" min="0" max="1" step="0.01" value="0.1"></div>
+      <div class="ctrl"><label>ridge_alpha<span id="v-gb-ra">1.0</span></label><input type="range" id="gb-ra" min="0" max="20" step="0.5" value="1.0"></div>
+    </div>
+    <button class="run-btn" data-exp="graybox">実行</button>
+  </div>
+  <div class="result-status" id="st-graybox"></div>
+  <div class="results" id="res-graybox"></div>
+</div>
+
+<!-- ── 転移学習 ── -->
+<div class="panel" id="panel-transfer">
+  <div class="panel-head">
+    <div class="panel-title">転移学習：過去の似たデータをどれだけ使うか</div>
+    <div class="panel-desc">ターゲットデータが少ない状況で、ターゲットのみ・素朴な転移・ドメイン拡張型を比較します。domain_gap が大きいと負の転移が起きます。</div>
+  </div>
+  <div class="controls">
+    <div class="ctrl-grid">
+      <div class="ctrl"><label>n_source<span id="v-tr-ns">300</span></label><input type="range" id="tr-ns" min="20" max="1000" step="20" value="300"></div>
+      <div class="ctrl"><label>n_target<span id="v-tr-nt">10</span></label><input type="range" id="tr-nt" min="3" max="100" step="1" value="10"></div>
+      <div class="ctrl"><label>domain_gap<span id="v-tr-dg">0.35</span></label><input type="range" id="tr-dg" min="0" max="2" step="0.05" value="0.35"></div>
+      <div class="ctrl"><label>transfer_weight<span id="v-tr-tw">0.6</span></label><input type="range" id="tr-tw" min="0" max="3" step="0.05" value="0.6"></div>
+      <div class="ctrl"><label>n_common<span id="v-tr-nc">8</span></label><input type="range" id="tr-nc" min="1" max="20" step="1" value="8"></div>
+      <div class="ctrl"><label>n_source_unique<span id="v-tr-su">3</span></label><input type="range" id="tr-su" min="0" max="10" step="1" value="3"></div>
+      <div class="ctrl"><label>n_target_unique<span id="v-tr-tu">3</span></label><input type="range" id="tr-tu" min="0" max="10" step="1" value="3"></div>
+    </div>
+    <button class="run-btn" data-exp="transfer">実行</button>
+  </div>
+  <div class="result-status" id="st-transfer"></div>
+  <div class="results" id="res-transfer"></div>
+</div>
+
+<!-- ── 生データ診断 ── -->
+<div class="panel" id="panel-rawdata">
+  <div class="panel-head">
+    <div class="panel-title">生データ診断：モデル前に見るべきもの</div>
+    <div class="panel-desc">外れ値・レンジ変更・トレンド・周期・欠損・下限張り付き・複数モードを入れて診断結果を確認します。flag=True が出たら原因を先に調べます。</div>
+  </div>
+  <div class="controls">
+    <div class="ctrl-grid">
+      <div class="ctrl"><label>n<span id="v-rd-n">300</span></label><input type="range" id="rd-n" min="50" max="1000" step="10" value="300"></div>
+      <div class="ctrl"><label>outlier_strength<span id="v-rd-os">4.0</span></label><input type="range" id="rd-os" min="0" max="10" step="0.5" value="4.0"></div>
+      <div class="ctrl"><label>range_shift<span id="v-rd-rs">1.0</span></label><input type="range" id="rd-rs" min="0" max="3" step="0.1" value="1.0"></div>
+      <div class="ctrl"><label>trend_strength<span id="v-rd-ts">0.5</span></label><input type="range" id="rd-ts" min="-2" max="2" step="0.1" value="0.5"></div>
+      <div class="ctrl"><label>cycle_strength<span id="v-rd-cs">0.8</span></label><input type="range" id="rd-cs" min="0" max="3" step="0.1" value="0.8"></div>
+      <div class="ctrl"><label>missing_rate<span id="v-rd-mr">0.05</span></label><input type="range" id="rd-mr" min="0" max="0.4" step="0.01" value="0.05"></div>
+      <div class="ctrl"><label>lower_clip<span id="v-rd-lc">0.0</span></label><input type="range" id="rd-lc" min="0" max="0.4" step="0.01" value="0.0"></div>
+      <div class="ctrl"><label>two_modes<span id="v-rd-tm">0.0</span></label><input type="range" id="rd-tm" min="0" max="4" step="0.1" value="0.0"></div>
+    </div>
+    <button class="run-btn" data-exp="rawdata">実行</button>
+  </div>
+  <div class="result-status" id="st-rawdata"></div>
+  <div class="results" id="res-rawdata"></div>
+</div>
+
+</main>
+
+<script>
+const PARAM_MAP = {
+  regression:       () => ({n:+v("r-n"),true_slope:+v("r-ts"),y_noise:+v("r-yn"),x_noise:+v("r-xn"),outlier_strength:+v("r-os"),seed:+v("r-seed")}),
+  multicollinearity:() => ({n_train:+v("mc-nt"),n_features:+v("mc-nf"),collinearity:+v("mc-cl"),y_noise:+v("mc-yn"),pls_components:+v("mc-pc"),ridge_alpha:+v("mc-ra")}),
+  jit:              () => ({x1_current:+v("jit-x1"),x2_current:+v("jit-x2"),wear_current:+v("jit-wc"),k:+v("jit-k"),bandwidth:+v("jit-bw"),pls_components:+v("jit-pc"),nonlinearity:+v("jit-nl"),drift_strength:+v("jit-ds"),noise:+v("jit-ns")}),
+  graybox:          () => ({physics_bias:+v("gb-pb"),parameter_drift:+v("gb-pd"),residual_strength:+v("gb-rs"),residual_observability:+v("gb-ro"),noise:+v("gb-ns"),ridge_alpha:+v("gb-ra")}),
+  transfer:         () => ({n_source:+v("tr-ns"),n_target:+v("tr-nt"),domain_gap:+v("tr-dg"),transfer_weight:+v("tr-tw"),n_common:+v("tr-nc"),n_source_unique:+v("tr-su"),n_target_unique:+v("tr-tu")}),
+  rawdata:          () => ({n:+v("rd-n"),outlier_strength:+v("rd-os"),range_shift:+v("rd-rs"),trend_strength:+v("rd-ts"),cycle_strength:+v("rd-cs"),missing_rate:+v("rd-mr"),lower_clip:+v("rd-lc"),two_modes:+v("rd-tm")}),
+};
+
+function v(id){ return document.getElementById(id)?.value ?? 0; }
+
+/* slider display sync */
+document.querySelectorAll("input[type=range]").forEach(el => {
+  const label = document.getElementById("v-" + el.id.replace(/-/g, "-"));
+  const display = document.querySelector(`[id="v-${el.id}"]`);
+  if(display) el.addEventListener("input", () => display.textContent = el.value);
+});
+
+/* tab switching */
+document.getElementById("tabs").addEventListener("click", e => {
+  const btn = e.target.closest(".tab-btn");
+  if(!btn) return;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
+});
+
+/* run experiment */
+async function run(exp) {
+  const btn = document.querySelector(`[data-exp="${exp}"]`);
+  const st = document.getElementById("st-" + exp);
+  const res = document.getElementById("res-" + exp);
+  if(!PARAM_MAP[exp]) return;
+  btn.disabled = true;
+  st.className = "result-status running";
+  st.textContent = "計算中…";
+  const params = PARAM_MAP[exp]();
+  try {
+    const r = await fetch("/api/run", {method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({exp, params})});
+    if(!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    st.className = "result-status";
+    st.textContent = "完了";
+    res.innerHTML = "";
+
+    if(data.images?.length){
+      const imgWrap = document.createElement("div"); imgWrap.className = "images";
+      data.images.forEach(src => {
+        const img = document.createElement("img"); img.src = src; imgWrap.append(img);
+      });
+      res.append(imgWrap);
+    }
+    (data.tables || []).forEach((tbl, i) => {
+      const wrap = document.createElement("div"); wrap.className = "table-wrap";
+      const title = document.createElement("div"); title.className = "table-title";
+      title.textContent = (data.table_titles || [])[i] || "結果";
+      wrap.append(title);
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const hr = document.createElement("tr");
+      tbl.columns.forEach(c => { const th = document.createElement("th"); th.textContent = c; hr.append(th); });
+      thead.append(hr); table.append(thead);
+      const tbody = document.createElement("tbody");
+      tbl.rows.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach(cell => { const td = document.createElement("td"); td.textContent = cell; tr.append(td); });
+        tbody.append(tr);
+      });
+      table.append(tbody); wrap.append(table); res.append(wrap);
+    });
+  } catch(e) {
+    st.className = "result-status error"; st.textContent = "エラー: " + e.message;
+  }
+  btn.disabled = false;
+}
+
+document.querySelectorAll(".run-btn").forEach(btn => {
+  btn.addEventListener("click", () => run(btn.dataset.exp));
+});
+
+/* auto-run the first tab on load */
+run("regression");
+</script>
+</body>
+</html>
