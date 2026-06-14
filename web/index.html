@@ -3,18 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Process Effect Lab</title>
+<meta name="robots" content="noindex,nofollow">
+<title>Process Effect Lab — 触って、壊れ方を見る</title>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f5f2ec;--card:#fff;--surface:#f0ece6;--border:#e3dbd0;
   --accent:#3c7876;--accent-dim:rgba(60,120,118,.09);--accent-soft:#e6f0ef;
+  --amber:#c9761f;--red:#c2543d;
   --text:#1d1b17;--muted:#7d7568;--faint:#aaa49b;
   --ok:#2e7d5e;--warn:#8c5a1a;--dot:#cfc9be;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Zen Kaku Gothic New',system-ui,sans-serif;background:var(--bg);color:var(--text);
-  min-height:100vh;padding-bottom:4rem;
+  min-height:100vh;padding-bottom:4rem;line-height:1.75;
   background-image:radial-gradient(circle,var(--dot) 1px,transparent 0);
   background-size:20px 20px;}
 header{position:sticky;top:0;z-index:100;background:rgba(245,242,236,.92);
@@ -24,8 +26,32 @@ header{position:sticky;top:0;z-index:100;background:rgba(245,242,236,.92);
 .logo{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:700;color:var(--text);}
 .logo span{color:var(--accent);}
 .caption{font-size:.75rem;color:var(--muted);}
+.header-link{margin-left:auto;font-size:.74rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.header-link a{color:var(--accent);text-decoration:none;}
 
 main{max-width:960px;margin:0 auto;padding:1.75rem 1.5rem 3rem;}
+
+/* Intro */
+.intro{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem 1.6rem;margin-bottom:1.4rem;}
+.intro h1{font-size:1.15rem;font-weight:700;margin-bottom:.4rem;}
+.intro .lead{font-size:.9rem;color:var(--text);line-height:1.8;margin-bottom:1rem;}
+.intro-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.7rem 1.3rem;margin-bottom:1rem;}
+.intro-grid .ig{font-size:.82rem;line-height:1.7;}
+.intro-grid .ig b{display:block;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--accent);
+  letter-spacing:.04em;margin-bottom:.15rem;}
+.intro-grid .ig span{color:var(--muted);}
+.flow{display:flex;align-items:stretch;gap:.6rem;flex-wrap:wrap;background:var(--accent-soft);
+  border:1px solid rgba(60,120,118,.2);border-radius:10px;padding:.85rem 1rem;font-size:.82rem;line-height:1.65;}
+.flow .step{flex:1 1 240px;}
+.flow .step b{color:var(--accent);}
+.flow .here{font-family:'JetBrains Mono',monospace;font-size:.66rem;background:var(--accent);color:#fff;
+  border-radius:4px;padding:.05rem .4rem;margin-right:.35rem;}
+.flow a{color:var(--accent);font-weight:700;text-decoration:none;}
+
+/* caveat */
+.caveat{background:#fdf6ec;border:1px solid #ecd9b8;border-radius:10px;padding:.85rem 1.1rem;
+  font-size:.78rem;color:#6f5a36;line-height:1.7;margin-bottom:1.4rem;}
+.caveat b{color:var(--amber);}
 
 /* Tab nav */
 .tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.5rem;
@@ -39,9 +65,34 @@ main{max-width:960px;margin:0 auto;padding:1.75rem 1.5rem 3rem;}
 /* Panel */
 .panel{display:none;}
 .panel.active{display:block;}
-.panel-head{margin-bottom:1.25rem;}
-.panel-title{font-size:1rem;font-weight:700;margin-bottom:.3rem;}
-.panel-desc{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.panel-head{margin-bottom:1rem;}
+.panel-title{font-size:1.05rem;font-weight:700;margin-bottom:.3rem;}
+.panel-desc{font-size:.82rem;color:var(--muted);line-height:1.7;}
+
+/* Learning card */
+.learn{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:1rem;overflow:hidden;}
+.learn>summary{list-style:none;cursor:pointer;padding:.7rem 1rem;font-size:.8rem;font-weight:700;color:var(--accent);
+  font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:.5rem;}
+.learn>summary::-webkit-details-marker{display:none;}
+.learn>summary::before{content:"▸";transition:transform .15s;}
+.learn[open]>summary::before{transform:rotate(90deg);}
+.learn-body{padding:.2rem 1.1rem 1rem;display:grid;grid-template-columns:1fr 1fr;gap:.7rem 1.4rem;}
+.learn-body .lc{font-size:.81rem;line-height:1.7;}
+.learn-body .lc b{display:block;font-size:.71rem;font-family:'JetBrains Mono',monospace;letter-spacing:.03em;margin-bottom:.1rem;}
+.lc.see b{color:var(--accent);} .lc.knob b{color:var(--accent);} .lc.up b{color:var(--accent);}
+.lc.metric b{color:var(--accent);} .lc.real b{color:var(--ok);} .lc.danger b{color:var(--red);}
+.lc.danger{color:#7a4a40;}
+.lc .mono{font-family:'JetBrains Mono',monospace;font-size:.92em;color:var(--amber);}
+@media(max-width:600px){.learn-body{grid-template-columns:1fr;}}
+
+/* Presets */
+.presets{margin-bottom:1.1rem;}
+.presets-label{font-size:.7rem;font-family:'JetBrains Mono',monospace;color:var(--faint);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem;}
+.preset-btns{display:flex;gap:.4rem;flex-wrap:wrap;}
+.preset-btn{padding:.28rem .7rem;border:1px solid var(--border);border-radius:999px;background:var(--card);
+  font-family:inherit;font-size:.74rem;color:var(--muted);cursor:pointer;transition:.15s;}
+.preset-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
 
 /* Controls */
 .controls{background:var(--card);border:1px solid var(--border);border-radius:12px;
@@ -79,11 +130,31 @@ th{background:var(--surface);color:var(--muted);font-family:'JetBrains Mono',mon
 td{padding:.35rem .65rem;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;}
 tr:last-child td{border-bottom:none;}
 
+/* interpretation */
+.interp{background:var(--accent-soft);border:1px solid rgba(60,120,118,.2);border-radius:10px;
+  padding:.85rem 1.1rem;display:none;}
+.interp.show{display:block;}
+.interp .ih{font-size:.7rem;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem;}
+.interp .ib{font-size:.83rem;line-height:1.75;color:var(--text);}
+.interp .ib .warn{color:var(--red);font-weight:700;}
+
 /* Knob table */
 .knob-section{background:var(--accent-soft);border:1px solid rgba(60,120,118,.2);
   border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;}
 .knob-section .table-title{color:var(--accent);}
 .knob-section table th{background:transparent;}
+
+/* Glossary */
+.glossary{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-top:2rem;overflow:hidden;}
+.glossary>summary{list-style:none;cursor:pointer;padding:1rem 1.3rem;font-size:.92rem;font-weight:700;
+  display:flex;align-items:center;gap:.5rem;}
+.glossary>summary::-webkit-details-marker{display:none;}
+.glossary>summary::before{content:"▸";color:var(--accent);transition:transform .15s;}
+.glossary[open]>summary::before{transform:rotate(90deg);}
+.gloss-grid{padding:.2rem 1.3rem 1.3rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.9rem 1.6rem;}
+.gloss-grid dt{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:700;color:var(--accent);margin-bottom:.15rem;}
+.gloss-grid dd{font-size:.79rem;color:var(--muted);line-height:1.65;}
 
 @media(max-width:600px){.images{grid-template-columns:1fr;}.ctrl-grid{grid-template-columns:1fr 1fr;}}
 </style>
@@ -92,11 +163,33 @@ tr:last-child td{border-bottom:none;}
 <header>
   <div class="header-inner">
     <span class="logo">Process <span>Effect</span> Lab</span>
-    <span class="caption">パラメータを動かして何が起きるかを確認する</span>
+    <span class="caption">触って、壊れ方を見る</span>
+    <span class="header-link">→ <a href="https://pml.tnks1407.com/" target="_blank">Modeling Lab</a></span>
   </div>
 </header>
 
 <main>
+
+<section class="intro">
+  <h1>パラメータを動かして、モデルがどこで壊れるかを見る</h1>
+  <p class="lead">プロセスデータ解析では、「何を変えると、モデルがどう・どこで壊れるか」を知っているかどうかが効きます。ここは数式を読む前に、<b>スライダーを動かして現象を体感する入口</b>。既製ライブラリのブラックボックスではなく、合成データで“壊れ方”を最初に見ます。</p>
+  <div class="intro-grid">
+    <div class="ig"><b>学べること</b><span>ノイズ・測定誤差・共線性・ドリフト・ドメイン差などを変えると、回帰・PLS・JIT・グレーボックス・転移がどう振る舞い、どこで崩れるか。</span></div>
+    <div class="ig"><b>誰向け</b><span>プロセス／品質／プラントのデータを扱う人。ソフトセンサーや回帰をこれから使う・教える人。</span></div>
+    <div class="ig"><b>最初にどこを押す</b><span>いちばん上のタブ「単回帰」で <span class="mono">実行</span>。あとはスライダーを動かして、また <span class="mono">実行</span>。プリセットで代表的な状態に一発で飛べます。</span></div>
+    <div class="ig"><b>何を見る</b><span>各デモの「見る指標」（R²・係数・RMSE・VIF など）と、結果の下に出る<b>自動の読み解き</b>。</span></div>
+    <div class="ig"><b>わかること</b><span>各手法の性質と“壊れ方”。なぜその指標が動くのか。</span></div>
+    <div class="ig"><b>わからないこと</b><span>あなたの実データでの最終性能。それには実測・前処理・検証が要ります（下の注意書き）。</span></div>
+  </div>
+  <div class="flow">
+    <div class="step"><span class="here">いま ここ</span><b>Effect Lab</b> ── ノイズ・共線性・ドリフトなどを動かして、モデルがどこで壊れるかを<b>体感</b>する。</div>
+    <div class="step">仕組みを掴んだら → <a href="https://pml.tnks1407.com/" target="_blank">Process Modeling Lab</a> で、OLS / Ridge / PCR / PLS / JIT / グレーボックス / 転移学習 を<b>実際のモデル計算で比較・診断</b>する。</div>
+  </div>
+</section>
+
+<div class="caveat">
+  <b>注意：</b>このサイトは教育・検討用の<b>合成データ実験</b>です。実プラント・実装置では、前処理／外れ値処理／時系列分割／リーク防止／センサ校正／運転範囲外判定／モデル更新周期／実測検証が必要です。ここでの結果は、モデルの<b>性質を理解するため</b>のもので、そのまま実務判断に使うものではありません。
+</div>
 
 <div class="knob-section">
   <div class="table-title">何を変えると何が起きるか</div>
@@ -145,6 +238,7 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="result-status" id="st-regression"></div>
   <div class="results" id="res-regression"></div>
+  <div class="interp" id="interp-regression"></div>
 </div>
 
 <!-- ── 多重共線性 ── -->
@@ -166,6 +260,7 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="result-status" id="st-multicollinearity"></div>
   <div class="results" id="res-multicollinearity"></div>
+  <div class="interp" id="interp-multicollinearity"></div>
 </div>
 
 <!-- ── JIT ── -->
@@ -190,6 +285,7 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="result-status" id="st-jit"></div>
   <div class="results" id="res-jit"></div>
+  <div class="interp" id="interp-jit"></div>
 </div>
 
 <!-- ── グレーボックス ── -->
@@ -211,6 +307,7 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="result-status" id="st-graybox"></div>
   <div class="results" id="res-graybox"></div>
+  <div class="interp" id="interp-graybox"></div>
 </div>
 
 <!-- ── 転移学習 ── -->
@@ -233,6 +330,7 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="result-status" id="st-transfer"></div>
   <div class="results" id="res-transfer"></div>
+  <div class="interp" id="interp-transfer"></div>
 </div>
 
 <!-- ── 生データ診断 ── -->
@@ -256,7 +354,31 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="result-status" id="st-rawdata"></div>
   <div class="results" id="res-rawdata"></div>
+  <div class="interp" id="interp-rawdata"></div>
 </div>
+
+<details class="glossary">
+  <summary>用語ミニ解説</summary>
+  <dl class="gloss-grid">
+    <div><dt>OLS</dt><dd>最小二乗法。y の縦方向の誤差を最小化して直線・平面を当てる、いちばん素朴な回帰。x は正確という前提。</dd></div>
+    <div><dt>Ridge</dt><dd>OLS に「係数を大きくしすぎない」罰則を足した回帰。共線性で暴れる係数を抑えて安定させる。alpha が罰則の強さ。</dd></div>
+    <div><dt>PCR</dt><dd>主成分回帰。入力をまず主成分（分散の大きい方向）に圧縮し、その少数成分で回帰する。共線性に強い。</dd></div>
+    <div><dt>PLS</dt><dd>部分最小二乗回帰。y と相関の高い方向に入力を圧縮してから回帰する。PCR より y を意識した圧縮で、プロセス分野の定番。</dd></div>
+    <div><dt>VIF</dt><dd>分散拡大係数。ある入力が他の入力でどれだけ説明できるかの指標。10 を超えると多重共線性が強く、係数が不安定。</dd></div>
+    <div><dt>条件数</dt><dd>入力行列の「歪み具合」。大きい（目安 100 超）ほど、わずかなデータ変化で係数が大きく動く＝解が不安定。</dd></div>
+    <div><dt>RMSE</dt><dd>二乗平均平方根誤差。予測のはずれ具合を元の単位で表す。小さいほど良い。外れ値に敏感。</dd></div>
+    <div><dt>R²</dt><dd>決定係数。y のばらつきのうちモデルが説明できた割合（1 が完全、0 が平均並み）。高くても係数解釈が正しいとは限らない。</dd></div>
+    <div><dt>JIT ソフトセンサー</dt><dd>Just-In-Time。予測したい点の近くのデータだけで毎回その場で局所モデルを作る方式。非線形・非定常に強いが計算が重い。</dd></div>
+    <div><dt>グレーボックスモデル</dt><dd>物理の式（ホワイト）とデータ駆動の補正（ブラック）を組み合わせたモデル。物理の足りない分を統計が補う。</dd></div>
+    <div><dt>転移学習</dt><dd>別だが似た条件（ソース）で貯めたデータを、データの少ない対象（ターゲット）の学習に活かす方法。</dd></div>
+    <div><dt>負の転移</dt><dd>ソースを使ったせいで、かえってターゲット単独より悪くなること。ドメイン差が大きいと起きやすい。</dd></div>
+    <div><dt>ドメインギャップ</dt><dd>ソースとターゲットの条件・分布の違い。大きいほど、過去データをそのまま使うと害になりやすい。</dd></div>
+    <div><dt>生データ診断</dt><dd>モデルに入れる前に、外れ値・欠損・トレンド・張り付きなど「データの素性」を点検すること。最初の関所。</dd></div>
+    <div><dt>リーク</dt><dd>本来使えない情報（未来の値・テスト側の統計など）が学習に混入すること。性能が嘘っぽく良く見える原因。</dd></div>
+    <div><dt>外れ値</dt><dd>他から大きく外れた点。原因（センサ異常・記録ミス・本当のイベント）を区別せずに消すのは危険。</dd></div>
+    <div><dt>ドリフト</dt><dd>時間とともに分布や関係がゆっくりずれていくこと。固定モデルは徐々に外し始める。JIT や更新が効く。</dd></div>
+  </dl>
+</details>
 
 </main>
 
@@ -272,9 +394,235 @@ const PARAM_MAP = {
 
 function v(id){ return document.getElementById(id)?.value ?? 0; }
 
+/* ── 学習カード ＋ プリセット（各パネルに注入） ── */
+const META = {
+  regression: {
+    card: {
+      see:"y 側のノイズと x 側の測定誤差は、モデルに違う壊れ方を起こします。y_noise を増やすと点が縦にばらついて R² が下がる。x_noise を増やすと、点の散らばりが増えるのに加えて OLS の傾きが真値より浅くなりやすい（回帰希釈）。",
+      knob:"① y_noise を 0.1 → 1.5　② x_noise を 0.0 → 0.7　③ outlier_strength を少し入れる",
+      up:"y_noise↑ で R² が下がる。x_noise↑ で ols_slope が true_slope より小さい方へずれる。outlier↑ で傾き・切片が一点に引っ張られる。",
+      metric:"R²、ols_slope（推定傾き）、true_slope との差、残差の形",
+      real:"説明変数側のセンサ誤差が大きいと、OLS の係数をそのまま物理感度として読めません。x の精度はモデル係数の信頼性に直結します。",
+      danger:"R² だけを見て「よいモデル」と判断しない。x 側の誤差があると、予測はそこそこでも係数解釈が先に壊れます。"
+    },
+    presets:[
+      {n:"yノイズだけ大きい", p:{"r-yn":1.5,"r-xn":0,"r-os":0,"r-n":120}},
+      {n:"x測定誤差だけ大きい", p:{"r-yn":0.3,"r-xn":0.7,"r-os":0,"r-n":120}},
+      {n:"外れ値あり", p:{"r-yn":0.4,"r-xn":0,"r-os":7,"r-n":80}},
+      {n:"サンプル数が少ない", p:{"r-n":20,"r-yn":0.6,"r-xn":0,"r-os":0}},
+      {n:"一見よさそうだが係数がずれる", p:{"r-yn":0.3,"r-xn":0.6,"r-os":0,"r-n":150}},
+    ],
+  },
+  multicollinearity: {
+    card: {
+      see:"入力同士が似た動きをすると、予測 RMSE はそこそこでも、OLS の係数の符号・大小が暴れます。PLS や Ridge は同じデータで係数を安定させます。",
+      knob:"① collinearity を 0.3 → 0.98　② pls_components を 1 → 多め　③ ridge_alpha を 0 → 10",
+      up:"collinearity↑ で VIF・条件数・OLS 係数のばらつきが急増。pls_components が少なすぎると説明不足、多すぎると OLS の不安定さに近づく。",
+      metric:"予測 RMSE、係数の不安定性（OLS vs PLS vs Ridge）、VIF、条件数、交差検証の最適成分数",
+      real:"共線性が強いと、係数を「その変数の効き」として読むのは危険。プロセスでは温度・圧力・流量が連動しやすく、ここは頻出。",
+      danger:"係数の符号を物理的意味として鵜呑みにしない。RMSE が悪くなくても、係数解釈は先に壊れています。"
+    },
+    presets:[
+      {n:"低共線性でOLSが安定", p:{"mc-cl":0.3,"mc-pc":3,"mc-ra":1}},
+      {n:"高共線性で係数が不安定", p:{"mc-cl":0.98,"mc-pc":2,"mc-ra":0}},
+      {n:"PLS成分が少なすぎる", p:{"mc-cl":0.95,"mc-pc":1,"mc-ra":1}},
+      {n:"PLS成分が多すぎる", p:{"mc-cl":0.95,"mc-pc":8,"mc-ra":1}},
+      {n:"Ridgeで係数が安定", p:{"mc-cl":0.95,"mc-pc":2,"mc-ra":12}},
+    ],
+  },
+  jit: {
+    card: {
+      see:"非線形・ドリフトのあるデータで、固定の全体モデルと、近傍だけ使う局所モデル（JIT）を比べます。k と bandwidth が「どれだけ近くだけ使うか」を決めます。",
+      knob:"① k を 3 ↔ 140　② bandwidth を 0.15 ↔ 2.0　③ drift_strength を上げる",
+      up:"k↑・bandwidth↑ で局所性が薄れ全体モデルに近づく。k↓・bandwidth↓ で局所的だがノイズを拾い分散が増える。drift↑ で固定モデルが不利、JIT が有利に。",
+      metric:"各モデルの RMSE / R²、現在点からの距離分布、固定モデルとの差",
+      real:"運転点が動く・メンテでリセットされる工程では、近い時期・近い条件のデータだけ使う JIT が効くことがある。ただし計算と運用が重い。",
+      danger:"k を小さくしすぎると、当たって見えてもノイズに過適合。RMSE のばらつき（再現性）も見ること。"
+    },
+    presets:[
+      {n:"kが小さすぎる", p:{"jit-k":3,"jit-bw":0.8,"jit-ds":1.0,"jit-ns":0.12}},
+      {n:"kが大きすぎる", p:{"jit-k":140,"jit-bw":0.8,"jit-ds":1.0}},
+      {n:"bandwidthが狭すぎる", p:{"jit-bw":0.15,"jit-k":35,"jit-ds":1.0}},
+      {n:"ドリフトがあるのでJITが有利", p:{"jit-ds":2.6,"jit-k":35,"jit-bw":0.8}},
+      {n:"局所モデルがノイズを拾いすぎる", p:{"jit-k":5,"jit-ns":0.5,"jit-bw":0.4}},
+    ],
+  },
+  graybox: {
+    card: {
+      see:"物理モデルだけ・統計だけ・組み合わせ（Parallel/Serial/Combined）を比べます。物理にバイアスがあっても、残差が観測量から説明できれば統計補正が効きます。",
+      knob:"① physics_bias を入れる　② residual_observability を 0.1 ↔ 0.95　③ parameter_drift を上げる",
+      up:"physics_bias↑ で物理単独の系統誤差が増える。residual_observability↑ で補正が効き Combined が伸びる。observability↓ だと補正できず物理の誤差が残る。drift↑ で固定パラメータの物理が崩れる。",
+      metric:"各モデルの RMSE / R²、物理単独と Combined の差、予測 vs 実測の散布",
+      real:"現場の物理モデルは“だいたい合うがバイアスがある”ことが多い。残差が測れる量に紐づくなら、捨てずに統計で補うのが筋。",
+      danger:"残差が観測量と無関係なのに補正を足すと、ノイズを学習して悪化。観測可能性のないバイアスは統計では消せません。"
+    },
+    presets:[
+      {n:"物理モデルだけで十分", p:{"gb-pb":0.0,"gb-pd":0.1,"gb-rs":0.1,"gb-ro":0.8}},
+      {n:"物理モデルにバイアスあり", p:{"gb-pb":1.6,"gb-rs":0.3,"gb-ro":0.8,"gb-pd":0.5}},
+      {n:"残差が観測しやすく補正が効く", p:{"gb-pb":0.9,"gb-rs":1.0,"gb-ro":0.95,"gb-pd":0.5}},
+      {n:"残差が観測しにくく補正が効かない", p:{"gb-pb":0.9,"gb-rs":1.0,"gb-ro":0.1,"gb-pd":0.5}},
+      {n:"パラメータドリフトが大きい", p:{"gb-pd":1.8,"gb-pb":0.3,"gb-ro":0.8}},
+    ],
+  },
+  transfer: {
+    card: {
+      see:"ターゲットのデータが少ないとき、似た別工程（ソース）のデータを使うべきか。ドメイン差が小さければ転移が効き、大きいと「使ったせいで悪化（負の転移）」が起きます。",
+      knob:"① domain_gap を 0.1 ↔ 1.5　② n_target を 4 ↔ 50　③ transfer_weight を上げすぎる",
+      up:"domain_gap↑ で素朴な転移が target-only より悪化（負の転移）。n_target↓ ほど転移の助けが要る。transfer_weight↑ でソースに寄りすぎて悪化することも。",
+      metric:"各手法の RMSE（target test）、target-only との差、ドメイン拡張型の安定性",
+      real:"過去データや類似ラインのデータは“多ければ良い”とは限らない。条件が離れていれば、足すほど害になることがあります。",
+      danger:"「データを増やせば良くなる」と思い込まない。domain_gap が大きいまま混ぜるのは、負の転移の典型です。"
+    },
+    presets:[
+      {n:"sourceとtargetが近く転移が効く", p:{"tr-dg":0.1,"tr-nt":10,"tr-tw":0.6}},
+      {n:"domain_gapが大きく負の転移", p:{"tr-dg":1.5,"tr-nt":10,"tr-tw":0.6}},
+      {n:"targetが少なく転移が助けになる", p:{"tr-nt":4,"tr-dg":0.3,"tr-tw":0.6}},
+      {n:"sourceを混ぜすぎて悪化", p:{"tr-dg":1.0,"tr-tw":2.6,"tr-nt":10}},
+      {n:"ドメイン拡張型が安定する", p:{"tr-dg":0.6,"tr-nt":10,"tr-tw":0.6,"tr-su":3,"tr-tu":3}},
+    ],
+  },
+  rawdata: {
+    card: {
+      see:"モデルに入れる前の生データに、外れ値・レンジ変更・トレンド・周期・欠損・下限張り付き・複数モードを仕込んで、自動診断が何を拾うかを見ます。",
+      knob:"プリセットで1種類ずつ入れる → 診断が flag を立てるか確認 → 複数を混ぜる",
+      up:"各つまみを上げると、その問題の検出率（outlier_rate・missing_rate など）と flag が立つ。複数モードや張り付きは分布の形に出ます。",
+      metric:"診断テーブルの flag、missing_rate、outlier_rate、時系列とヒストグラムの形",
+      real:"前処理・分割の方針は、この診断結果で決まります。張り付き・レンジ変更を見落とすと、後段のモデルが静かに壊れます。",
+      danger:"flag が立った点を機械的に削除しない。外れ値が“本物のイベント”のこともある。原因を先に調べること。"
+    },
+    presets:[
+      {n:"外れ値", p:{"rd-os":7,"rd-rs":0,"rd-ts":0,"rd-cs":0,"rd-mr":0,"rd-lc":0,"rd-tm":0}},
+      {n:"レンジ変更", p:{"rd-os":0,"rd-rs":2.5,"rd-ts":0,"rd-cs":0,"rd-mr":0,"rd-lc":0,"rd-tm":0}},
+      {n:"トレンド", p:{"rd-os":0,"rd-rs":0,"rd-ts":1.6,"rd-cs":0,"rd-mr":0,"rd-lc":0,"rd-tm":0}},
+      {n:"周期変動", p:{"rd-os":0,"rd-rs":0,"rd-ts":0,"rd-cs":2.5,"rd-mr":0,"rd-lc":0,"rd-tm":0}},
+      {n:"欠損", p:{"rd-os":0,"rd-rs":0,"rd-ts":0,"rd-cs":0,"rd-mr":0.3,"rd-lc":0,"rd-tm":0}},
+      {n:"下限張り付き", p:{"rd-os":0,"rd-rs":0,"rd-ts":0,"rd-cs":0,"rd-mr":0,"rd-lc":0.3,"rd-tm":0}},
+      {n:"複数モード", p:{"rd-os":0,"rd-rs":0,"rd-ts":0,"rd-cs":0,"rd-mr":0,"rd-lc":0,"rd-tm":3}},
+    ],
+  },
+};
+
+function buildLearnAndPresets(){
+  for(const exp in META){
+    const panel = document.getElementById("panel-"+exp);
+    const head = panel.querySelector(".panel-head");
+    const c = META[exp].card;
+    const learn = document.createElement("details"); learn.className = "learn";
+    learn.innerHTML =
+      '<summary>このデモの読み方（見ること・触るつまみ・実務での意味）</summary>'+
+      '<div class="learn-body">'+
+        '<div class="lc see"><b>このデモで見ること</b>'+c.see+'</div>'+
+        '<div class="lc knob"><b>まず触るつまみ</b>'+c.knob+'</div>'+
+        '<div class="lc up"><b>増やすと起きること</b>'+c.up+'</div>'+
+        '<div class="lc metric"><b>見る指標</b>'+c.metric+'</div>'+
+        '<div class="lc real"><b>実務での意味</b>'+c.real+'</div>'+
+        '<div class="lc danger"><b>危ない読み方</b>'+c.danger+'</div>'+
+      '</div>';
+    head.after(learn);
+    const pr = document.createElement("div"); pr.className = "presets";
+    pr.innerHTML = '<div class="presets-label">プリセット（押すと代表的な状態へ → 実行）</div>'+
+      '<div class="preset-btns">'+META[exp].presets.map((ps,i)=>
+        '<button class="preset-btn" data-exp="'+exp+'" data-pi="'+i+'">'+ps.n+'</button>').join('')+'</div>';
+    learn.after(pr);
+  }
+  document.querySelectorAll(".preset-btn").forEach(b=>{
+    b.addEventListener("click",()=>applyPreset(b.dataset.exp, +b.dataset.pi));
+  });
+}
+
+function applyPreset(exp, i){
+  const ps = META[exp].presets[i];
+  for(const id in ps.p){
+    const el = document.getElementById(id);
+    if(!el) continue;
+    el.value = ps.p[id];
+    const disp = document.querySelector('[id="v-'+id+'"]');
+    if(disp) disp.textContent = el.value;
+  }
+  run(exp);
+}
+
+/* ── 結果の自動解釈（パラメータ＋返ってきた指標から短文を出す） ── */
+function rnum(data, col, row=0){
+  try{ const t=(data.tables||[]).find(t=>t.columns.includes(col));
+    if(!t) return null; const j=t.columns.indexOf(col); return parseFloat(t.rows[row][j]); }catch(e){ return null; }
+}
+function interpret(exp, params, data){
+  const out=[];
+  if(exp==="regression"){
+    const r2=rnum(data,"r2"), slope=rnum(data,"ols_slope");
+    if(params.x_noise>=0.35){
+      out.push('<span class="warn">x_noise が大きい</span>ので、R² だけでなく推定傾きのズレを見てください。説明変数側の測定誤差は OLS の係数を真値より浅い方へずらします'+
+        (slope!=null?'（今回 ols_slope≈'+slope.toFixed(2)+' / true_slope='+params.true_slope+'）':'')+'。');
+    } else if(params.y_noise>=1.0){
+      out.push('y_noise が大きく、点が縦にばらついて R²'+(r2!=null?'≈'+r2.toFixed(2):'')+' が下がっています。ただし x が正確なら、傾き自体は大きくは偏りません。');
+    } else if(params.outlier_strength>=4){
+      out.push('外れ値が効いています。OLS は二乗誤差なので一点に強く引っ張られ、傾き・切片がずれます。残差の形（一点だけ大きい）を確認してください。');
+    } else {
+      out.push('ノイズも測定誤差も小さい素直な状態。標準化傾きが相関係数に一致し、R²'+(r2!=null?'≈'+r2.toFixed(2):'')+' も素直に読めます。');
+    }
+    if(params.n<=30) out.push('サンプル数が少ない（n='+params.n+'）ので、seed を変えると結果が大きく動きます。一回の当たり外れで判断しないこと。');
+  }
+  else if(exp==="multicollinearity"){
+    if(params.collinearity>=0.9){
+      out.push('<span class="warn">collinearity が高い</span>ため、予測 RMSE がそれほど悪化していなくても、係数の解釈は不安定です。VIF と条件数が高い場合、係数の符号や大小を物理的意味として読むのは危険。OLS と PLS/Ridge の係数のばらつきを見比べてください。');
+    } else if(params.collinearity<=0.5){
+      out.push('共線性が低いので OLS の係数も比較的安定。この領域では OLS と PLS の係数は近くなります。');
+    } else {
+      out.push('中程度の共線性。OLS の係数がやや暴れ始める境目です。collinearity を上げて、どこから壊れるか境界を探してみてください。');
+    }
+    if(params.pls_components<=1) out.push('pls_components=1 は圧縮しすぎで、説明不足（バイアス大）になりがちです。交差検証の最適成分数と比べてみて。');
+    if(params.pls_components>=6) out.push('pls_components が多いと、PLS は次第に OLS の不安定さに近づきます。少ない成分で足りるかを確認。');
+    if(params.ridge_alpha>=8) out.push('ridge_alpha が大きく、係数が原点側に強く縮みます。安定はするが、過度だと効きまで潰します。');
+  }
+  else if(exp==="jit"){
+    if(params.k<=6){ out.push('<span class="warn">k が小さすぎ</span>ます。近傍が少なすぎて局所モデルがノイズに過適合し、当たって見えても再現性が低い。RMSE のばらつきに注意。'); }
+    else if(params.k>=110){ out.push('k が大きすぎて、局所モデルがほぼ全体モデルになっています。JIT の利点（非線形・非定常への追従）が消えます。'); }
+    if(params.bandwidth<=0.2) out.push('bandwidth が狭すぎると、重みがごく近傍に集中して実質サンプル数が激減します。');
+    if(params.drift_strength>=2.0) out.push('ドリフトが強い状況です。固定モデルは時間とともに外し、近い時期・近い条件を使う JIT 系が有利になりやすい。残差プロットでドリフト区間の誤差を見てください。');
+    if(out.length===0) out.push('標準的な設定。固定 PLS と局所モデルの RMSE を比べ、どの局所化（k・bandwidth）が一番効くかを探ってください。');
+  }
+  else if(exp==="graybox"){
+    if(params.residual_observability<=0.2 && params.physics_bias!==0){
+      out.push('<span class="warn">残差の可観測性が低い</span>のに物理バイアスがあります。残差が観測量から説明できないため、統計補正は効きにくく、物理単独の誤差が残ります。observability を上げると Combined が伸びるはず。');
+    } else if(params.residual_observability>=0.8 && params.residual_strength>=0.6){
+      out.push('残差が観測量とよく相関する状況。Parallel/Combined（物理＋残差補正）が物理単独より明確に良くなるはずです。物理の足りない分を統計が拾えています。');
+    }
+    if(params.parameter_drift>=1.3) out.push('parameter_drift が大きく、固定パラメータの物理式が崩れます。θ をデータで学ぶ Serial 型や Combined が効きやすい。');
+    if(Math.abs(params.physics_bias)<=0.1 && params.residual_strength<=0.2) out.push('物理がほぼ正確でノイズも小さい。この場合は物理モデル単独で十分で、統計補正の上乗せは小さい。');
+    if(out.length===0) out.push('各モデルの RMSE/R² を比べ、物理単独と Combined の差を見てください。差が大きいほど「統計補正が効いている」状態です。');
+  }
+  else if(exp==="transfer"){
+    if(params.domain_gap>=1.0){
+      out.push('<span class="warn">domain_gap が大きい</span>ため、素朴な転移モデルが target-only より悪化しやすい。これが<b>負の転移</b>です。過去データやソースを増やすことが、必ずしも改善につながるとは限りません。target-only と素朴転移の RMSE を比べてください。');
+    } else if(params.domain_gap<=0.2){
+      out.push('ドメイン差が小さく、ソースのデータがそのまま効きます。転移モデルが target-only を明確に上回るはず。');
+    }
+    if(params.n_target<=5) out.push('n_target が少ない（'+params.n_target+'）ので target-only は過学習しがち。ここは転移やドメイン拡張型が助けになりやすい局面です。');
+    if(params.transfer_weight>=2.0) out.push('transfer_weight が大きく、ソースに寄りすぎています。domain_gap があると、寄せるほど悪化することがある。');
+    if(out.length===0) out.push('ドメイン拡張型（共通＋固有特徴）が、素朴転移と target-only の間で安定するかを確認してください。');
+  }
+  else if(exp==="rawdata"){
+    const flags=[];
+    if(params.outlier_strength>=3) flags.push("外れ値");
+    if(params.range_shift>=1.5) flags.push("レンジ変更");
+    if(Math.abs(params.trend_strength)>=1.0) flags.push("トレンド");
+    if(params.cycle_strength>=1.5) flags.push("周期");
+    if(params.missing_rate>=0.15) flags.push("欠損");
+    if(params.lower_clip>=0.15) flags.push("下限張り付き");
+    if(params.two_modes>=1.5) flags.push("複数モード");
+    if(flags.length){
+      out.push('仕込んだ問題：<b>'+flags.join(' / ')+'</b>。診断テーブルの flag と、対応する指標（outlier_rate・missing_rate など）が立っているか確認してください。');
+      out.push('<span class="warn">注意：</span>flag が立った点を機械的に削除しないこと。外れ値が本物のイベントのこともあります。原因を先に調べてから前処理を決めます。');
+    } else {
+      out.push('いまは大きな問題を仕込んでいない素直なデータ。プリセットで1種類ずつ問題を入れて、診断が何を拾うかを見てください。');
+    }
+  }
+  return out.map(s=>'<p style="margin:.2rem 0;">'+s+'</p>').join('');
+}
+
 /* slider display sync */
 document.querySelectorAll("input[type=range]").forEach(el => {
-  const label = document.getElementById("v-" + el.id.replace(/-/g, "-"));
   const display = document.querySelector(`[id="v-${el.id}"]`);
   if(display) el.addEventListener("input", () => display.textContent = el.value);
 });
@@ -291,13 +639,15 @@ document.getElementById("tabs").addEventListener("click", e => {
 
 /* run experiment */
 async function run(exp) {
-  const btn = document.querySelector(`[data-exp="${exp}"]`);
+  const btn = document.querySelector(`.run-btn[data-exp="${exp}"]`);
   const st = document.getElementById("st-" + exp);
   const res = document.getElementById("res-" + exp);
+  const ip = document.getElementById("interp-" + exp);
   if(!PARAM_MAP[exp]) return;
-  btn.disabled = true;
+  if(btn) btn.disabled = true;
   st.className = "result-status running";
   st.textContent = "計算中…";
+  if(ip) ip.classList.remove("show");
   const params = PARAM_MAP[exp]();
   try {
     const r = await fetch("/api/run", {method:"POST",
@@ -334,16 +684,22 @@ async function run(exp) {
       });
       table.append(tbody); wrap.append(table); res.append(wrap);
     });
+
+    if(ip){
+      const html = interpret(exp, params, data);
+      if(html){ ip.innerHTML = '<div class="ih">結果の読み解き</div><div class="ib">'+html+'</div>'; ip.classList.add("show"); }
+    }
   } catch(e) {
     st.className = "result-status error"; st.textContent = "エラー: " + e.message;
   }
-  btn.disabled = false;
+  if(btn) btn.disabled = false;
 }
 
 document.querySelectorAll(".run-btn").forEach(btn => {
   btn.addEventListener("click", () => run(btn.dataset.exp));
 });
 
+buildLearnAndPresets();
 /* auto-run the first tab on load */
 run("regression");
 </script>
